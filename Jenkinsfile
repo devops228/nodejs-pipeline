@@ -35,7 +35,8 @@ pipeline {
     }
     
     stage("Scan image"){
-      sh '''
+     steps{
+	sh '''
         docker run -d --name db arminc/clair-db
         sleep 15 # wait for db to come up
         docker run -p 6060:6060 --link db:postgres -d --name clair arminc/clair-local-scan
@@ -44,7 +45,8 @@ pipeline {
         wget -qO clair-scanner https://github.com/arminc/clair-scanner/releases/download/v8/clair-scanner_linux_amd64 && chmod +x clair-scanner
         ./clair-scanner --ip="$DOCKER_GATEWAY" nodejs:${uuid_hash}:latest || exit 0
       '''
-    }
+     }   
+  }
     stage("Push to ECR") {
         steps {
         //cleanup current user docker credentials
