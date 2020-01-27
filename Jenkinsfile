@@ -43,8 +43,12 @@ pipeline {
         sleep 1
         DOCKER_GATEWAY=$(docker network inspect bridge --format "{{range .IPAM.Config}}{{.Gateway}}{{end}}")
         wget -qO clair-scanner https://github.com/arminc/clair-scanner/releases/download/v8/clair-scanner_linux_amd64 && chmod +x clair-scanner
-        ./clair-scanner --ip="$DOCKER_GATEWAY" nodejs:${uuid_hash}:latest || exit 0
-      '''
+        ./clair-scanner --ip="$DOCKER_GATEWAY" nodejs:latest || exit 0
+        // stop and delete images
+        docker stop $(docker ps -a -q)
+        docker rm $(docker ps -a -q)
+	'''
+      
      }   
   }
     stage("Push to ECR") {
